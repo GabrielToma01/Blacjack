@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.Random;
@@ -16,6 +17,7 @@ public class Dealer extends AppCompatActivity {
     public int y = 0;
     public int playerScore = 0;
 
+    Timer myTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,11 +27,23 @@ public class Dealer extends AppCompatActivity {
         Intent intent = getIntent();
         playerScore = intent.getIntExtra("PlayerScore", 0);
 
+        myTimer = new Timer();
 
+        findViewById(R.id.button5).setOnClickListener(v -> {
+            myTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(() -> {
+                        DealerC();
+                    });
+                }
+
+            }, 500, 2000);
+        });
     }
 
 
-    public void DealerC(View v) {
+    public void DealerC() {
         int[] images = new int[]{1, 2, R.drawable.c2, R.drawable.d3, R.drawable.h4, R.drawable.s5, R.drawable.c6, R.drawable.d7, R.drawable.h8, R.drawable.s9, R.drawable.c10, R.drawable.da, R.drawable.hj, R.drawable.sq, R.drawable.ck};
         Random rand = new Random();
 
@@ -43,6 +57,7 @@ public class Dealer extends AppCompatActivity {
         y = y + i;
         tv1.setText("Score: " + y);
         if (y > 21) {
+            myTimer.cancel();
             Intent q = new Intent(this, MainActivity.class);
             AlertDialog alertDialog = new AlertDialog.Builder(Dealer.this).create();
             alertDialog.setTitle("You Won!");
@@ -53,7 +68,8 @@ public class Dealer extends AppCompatActivity {
             });
             alertDialog.show();
         }
-        if (y > playerScore) {
+        else if (y > playerScore) {
+            myTimer.cancel();
             Intent q = new Intent(this, MainActivity.class);
             AlertDialog alertDialog = new AlertDialog.Builder(Dealer.this).create();
             alertDialog.setTitle("You lost!");
@@ -64,18 +80,11 @@ public class Dealer extends AppCompatActivity {
             });
             alertDialog.show();
         }
-        if (y < playerScore) {
-            Timer t = new Timer();
-            t.schedule(new TimerTask() {
-                public void run() {
-                    DealerC(null);
-                }
-            }, 2000, 2000);
-        }
     }
 
 
     public void Stop (View v){
+        myTimer.cancel();
         Intent q = new Intent(this, MainActivity.class);
         AlertDialog alertDialog = new AlertDialog.Builder(Dealer.this).create();
         alertDialog.setTitle("You lost");
